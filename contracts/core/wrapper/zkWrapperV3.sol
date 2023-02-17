@@ -47,15 +47,18 @@ contract WrapperV3 is Ownable, Pausable, ReentrancyGuard {
     function extractFee(address token) external {
         require(msg.sender == feeCollector, "!feeCollector");
         if (token == address(0)) {
-            payable(msg.sender).transfer(address(this).balance);
+            transferEtherFromContract(feeCollector, address(this).balance);
         } else {
             IERC20(token).safeTransfer(feeCollector, IERC20(token).balanceOf(address(this)));
         }
     }
 
     function rescueFund(address tokenAddress) public onlyOwner {
-        IERC20 token = IERC20(tokenAddress);
-        token.safeTransfer(_msgSender(), token.balanceOf(address(this)));
+        if (tokenAddress == address(0)) {
+            transferEtherFromContract(msg.sender, address(this).balance);
+        } else {
+            IERC20(tokenAddress).safeTransfer(msg.sender, IERC20(tokenAddress).balanceOf(address(this)));
+        }
     }
     
     function lock(address fromAsset, uint64 toChainId, bytes memory toAddress, uint amount, uint fee, uint id) public payable nonReentrant whenNotPaused {
@@ -135,6 +138,11 @@ contract WrapperV3 is Ownable, Pausable, ReentrancyGuard {
             }
         }
         return res;
+    }
+
+    function transferEtherFromContract(address to, uint amount) internal {
+        (bool success,) = to.call{value: amount}("");
+        require(success, "transfer ether from contract failed");
     }
 
     event PolyWrapperLock(address indexed fromAsset, address indexed sender, uint64 toChainId, bytes toAddress, uint net, uint fee, uint id);
