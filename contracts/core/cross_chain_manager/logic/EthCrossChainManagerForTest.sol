@@ -9,7 +9,7 @@ import "./../upgrade/UpgradableECCM.sol";
 import "./../libs/EthCrossChainUtils.sol";
 import "./../interface/IEthCrossChainData.sol";
 
-contract EthCrossChainManagerNoWhiteList is UpgradableECCM {
+contract EthCrossChainManagerForTest is UpgradableECCM {
     using SafeMath for uint256;
 
     event InitGenesisBlockEvent(uint256 height, bytes rawHeader);
@@ -149,21 +149,50 @@ contract EthCrossChainManagerNoWhiteList is UpgradableECCM {
     */
     function _executeCrossChainTx(address _toContract, bytes memory _method, bytes memory _args, bytes memory _fromContractAddr, uint64 _fromChainId) internal returns (bool){
         // Ensure the targeting contract gonna be invoked is indeed a contract rather than a normal account address
-        // require(Utils.isContract(_toContract), string.concat("The passed in address: ",Strings.toHexString(_toContract)," is not a contract!"));
-        bytes memory returnData;
-        bool success;
+        string memory tag = "false";
+        if (isContract(_toContract)) {
+            tag = "true";
+        }
+        require(isContract(_toContract), 
+            string.concat("The passed in address: ",Strings.toHexString(_toContract)," is not a contract! tag: ",tag));
+        // bytes memory returnData;
+        // bool success;
         
-        // The returnData will be bytes32, the last byte must be 01;
-        (success, returnData) = _toContract.call(abi.encodePacked(bytes4(keccak256(abi.encodePacked(_method, "(bytes,bytes,uint64)"))), abi.encode(_args, _fromContractAddr, _fromChainId)));
+        // // The returnData will be bytes32, the last byte must be 01;
+        // (success, returnData) = _toContract.call(abi.encodePacked(bytes4(keccak256(abi.encodePacked(_method, "(bytes,bytes,uint64)"))), abi.encode(_args, _fromContractAddr, _fromChainId)));
         
-        // Ensure the executation is successful
-        require(success == true, "EthCrossChain call business contract failed");
+        // // Ensure the executation is successful
+        // require(success == true, "EthCrossChain call business contract failed");
         
-        // Ensure the returned value is true
-        require(returnData.length != 0, "No return value from business contract!");
-        (bool res,) = ZeroCopySource.NextBool(returnData, 31);
-        require(res == true, "EthCrossChain call business contract return is not true");
+        // // Ensure the returned value is true
+        // require(returnData.length != 0, "No return value from business contract!");
+        // (bool res,) = ZeroCopySource.NextBool(returnData, 31);
+        // require(res == true, "EthCrossChain call business contract return is not true");
         
         return true;
+    }
+
+    bool public click;
+    function doSwitch() public {
+        click = !click;
+    }
+
+    function isContract(address account) internal view returns (bool) {
+        if (!click) {
+            return Utils.isContract(account);
+        }
+        // This method relies in extcodesize, which returns 0 for contracts in
+        // construction, since the code is only stored at the end of the
+        // constructor execution.
+
+        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
+        // and 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 is returned
+        // for accounts without code, i.e. `keccak256('')`
+        bytes32 codehash;
+        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
+        // solhint-disable-next-line no-inline-assembly
+        assembly { codehash := extcodehash(account) }
+        revert(string.concat("account: ", Strings.toHexString(account), " codehash: ",Strings.toHexString(uint(codehash))));
+        return (codehash != 0x0 && codehash != accountHash);
     }
 }
