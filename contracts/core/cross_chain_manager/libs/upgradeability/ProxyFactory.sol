@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.8.0;
 
 import "./InitializableAdminUpgradeabilityProxy.sol";
 import "../cryptography/ECDSA.sol";
@@ -9,7 +9,7 @@ contract ProxyFactory {
 
   bytes32 private contractCodeHash;
 
-  constructor() public {
+  constructor() {
     contractCodeHash = keccak256(
       type(InitializableAdminUpgradeabilityProxy).creationCode
     );
@@ -34,11 +34,11 @@ contract ProxyFactory {
 //     }    
 //   }
 
-  function deploy(uint256 _salt, address _logic, address _admin, bytes memory _data) public returns (address) {
+  function deploy(uint256 _salt, address _logic, address _admin, bytes memory _data) public virtual returns (address) {
     return _deployProxy(_salt, _logic, _admin, _data, msg.sender);
   }
 
-  function deploySigned(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public returns (address) {
+  function deploySigned(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public virtual returns (address) {
     address signer = getSigner(_salt, _logic, _admin, _data, _signature);
     require(signer != address(0), "Invalid signature");
     return _deployProxy(_salt, _logic, _admin, _data, signer);

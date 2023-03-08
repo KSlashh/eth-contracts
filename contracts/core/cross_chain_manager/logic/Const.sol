@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 contract Const {
     bytes constant ZionCrossChainManagerAddress = hex"0000000000000000000000000000000000001003"; 
     

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 import "../ownership/Ownable.sol";
 import "./AdminUpgradeabilityProxy.sol";
@@ -63,6 +63,6 @@ contract ProxyAdmin is OpenZeppelinUpgradesOwnable {
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    */
   function upgradeAndCall(AdminUpgradeabilityProxy proxy, address implementation, bytes memory data) payable public onlyOwner {
-    proxy.upgradeToAndCall.value(msg.value)(implementation, data);
+    proxy.upgradeToAndCall{value: msg.value}(implementation, data);
   }
 }

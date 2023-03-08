@@ -3,9 +3,9 @@ info.txt
 tmp
 build
 .idea
-hardhat.config.js
 
 node_modules
+package-lock.json
 /.project
 /.settings/
 
@@ -31,5 +31,11 @@ apidoc/
 node_modules
 
 artifacts/
-config.json
+artifacts-zk/
 cache/
+cache-zk/
+
+
+hardhat.config.js
+hardhat.config.ts
+hardhat.config*

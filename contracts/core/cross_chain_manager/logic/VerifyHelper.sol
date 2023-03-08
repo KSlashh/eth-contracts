@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 import "../interface/IEthCrossChainData.sol";
 import "../libs/ECCUtils/EthCrossChainUtils.sol";
@@ -9,7 +9,7 @@ contract VerifyHelper {
     address public EthCrossChainDataAddress;
     bytes public ZionCrossChainManagerAddress;
 
-    constructor(address ethCrossChainDataAddress, bytes memory zionCrossChainManagerAddress) public {
+    constructor(address ethCrossChainDataAddress, bytes memory zionCrossChainManagerAddress) {
         EthCrossChainDataAddress = ethCrossChainDataAddress;
         ZionCrossChainManagerAddress = zionCrossChainManagerAddress;
     }

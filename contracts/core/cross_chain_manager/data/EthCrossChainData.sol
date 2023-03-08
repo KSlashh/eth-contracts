@@ -1,10 +1,10 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 import "./../../../libs/ownership/Ownable.sol";
 import "./../../../libs/lifecycle/Pausable.sol";
 import "../interface/IEthCrossChainData.sol";
 
-contract EthCrossChainData is IEthCrossChainData, Ownable, Pausable{
+contract EthCrossChainData is Ownable, Pausable{
 
     mapping(uint256 => bytes32) public EthToPolyTxHashMap;
   

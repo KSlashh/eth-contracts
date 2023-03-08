@@ -1,13 +1,13 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 import "./../../libs/ownership/Ownable.sol";
 import "./../../libs/common/ZeroCopySource.sol";
 import "./../../libs/common/ZeroCopySink.sol";
 import "./../../libs/utils/Utils.sol";
+import "./../../libs/math/SafeMath.sol";
 import "./../../libs/token/ERC20/SafeERC20.sol";
 import "./interface/IEthCrossChainManager.sol";
 import "./interface/IEthCrossChainManagerProxy.sol";
-
 
 contract LockProxy is Ownable {
     using SafeMath for uint;
@@ -146,14 +146,18 @@ contract LockProxy is Ownable {
         if (toAssetHash == address(0x0000000000000000000000000000000000000000)) {
             // toAssetHash === address(0) denotes contract needs to unlock ether to toAddress
             // convert toAddress from 'address' type to 'address payable' type, then actively transfer ether
-            address(uint160(toAddress)).transfer(amount);
+            _transferEtherFromContract(toAddress, amount);
         } else {
             // actively transfer amount of asset from msg.sender to lock_proxy contract 
             require(_transferERC20FromContract(toAssetHash, toAddress, amount), "transfer erc20 asset to lock_proxy contract failed!");
         }
         return true;
     }
-    
+
+    function _transferEtherFromContract(address to, uint amount) internal {
+        (bool success,) = to.call{value: amount}("");
+        require(success, "transfer ether from contract failed");
+    }
     
     function _transferERC20ToContract(address fromAssetHash, address fromAddress, address toAddress, uint256 amount) internal returns (bool) {
          IERC20 erc20Token = IERC20(fromAssetHash);
