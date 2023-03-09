@@ -168,7 +168,7 @@ contract EthCrossChainManagerImplementation is Const {
         return true;
     }
     
-    function fallback() public payable {
+    fallback() external payable {
         revert("Unsupported function");
     }
 }

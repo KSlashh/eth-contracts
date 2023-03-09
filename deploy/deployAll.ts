@@ -94,7 +94,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   if (config.CallerFactory === undefined) {
       // deploy CallerFactory
       console.log("\ndeploy CallerFactory ......");
-      cf = await deployer.deploy(CallerFactory, [lockproxy.address]);
+      cf = await deployer.deploy(CallerFactory, [[lockproxy.address]]);
       await cf.deployed();
       console.log("CallerFactory deployed to:", cf.address);
       config.CallerFactory = cf.address
@@ -131,9 +131,9 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   if (config.EthCrossChainManager === undefined) {
       // deploy EthCrossChainManager
       console.log("\ndeploy EthCrossChainManager ......");
-      ccm = await deployer.deploy(EthCrossChainManager, [ccmi.address,deployer.address,'0x']);
+      ccm = await deployer.deploy(EthCrossChainManager, [ccmi.address, wallet.address ,'0x']);
       await ccm.deployed();
-      console.log("EthCrossChainManager deployed to:", ccm.address.blue);
+      console.log("EthCrossChainManager deployed to:", ccm.address);
       config.EthCrossChainManager = ccm.address
       writeConfig(config)
   } else {
@@ -270,7 +270,7 @@ function createEmptyConfig() {
 async function updateConst(polyChainId, eccd, callerFactory) {
   
     fs.writeFileSync('./contracts/core/cross_chain_manager/logic/Const.sol', 
-    'pragma solidity ^0.5.0;\n'+
+    'pragma solidity ^0.8.0;\n'+
     'contract Const {\n'+
     '    bytes constant ZionCrossChainManagerAddress = hex"0000000000000000000000000000000000001003"; \n'+
     // '    bytes constant ZionCrossChainManagerAddress = hex"5747C05FF236F8d18BB21Bc02ecc389deF853cae"; \n'+
